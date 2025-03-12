@@ -10,11 +10,20 @@ let messages = ref<string[]>([])
 
 function connect() {
   if (username.value.trim() !== '') {
+    // requestNotificationPermission()
+    // registerServiceWorker()
     SocketioService.setupSocketConnection(username.value)
     isConnected.value = true
 
     SocketioService.socket.on('my broadcast', (message: any) => {
       messages.value.push(message)
+
+      if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification('Neue Nachricht', {
+          body: message,
+          icon: '/chat-icon.png', // Optional: eigenes Icon hinzufügen
+        })
+      }
     })
   }
 }
@@ -27,6 +36,28 @@ function sendMessage() {
   if (newMessage.value.trim() !== '') {
     SocketioService.socket.emit('my message', newMessage.value)
     newMessage.value = ''
+  }
+}
+
+async function requestNotificationPermission() {
+  if ('Notification' in window) {
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      console.log('Benachrichtigungen blockiert!')
+    }
+  }
+}
+
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        console.log('Service Worker registriert:', registration)
+      })
+      .catch((error) => {
+        console.log('Service Worker Registrierung fehlgeschlagen:', error)
+      })
   }
 }
 </script>
