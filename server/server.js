@@ -30,9 +30,9 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 
-  socket.on("my message", (msg) => {
-    console.log("message: " + msg);
-  });
+  // socket.on("my message", (msg) => {
+  //   console.log("message: " + msg);
+  // });
 });
 
 // Wichtig: Nutze `server.listen`, NICHT `app.listen`
